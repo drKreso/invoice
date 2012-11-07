@@ -2,9 +2,22 @@
 
 Print out simple invoice tailored for Croatia. You can setup your company data along with your customers with some easy settings.
 
-This is called to generate your invoice in .pdf
-```ruby
-CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop')
+After that you need to setup invoice data and render the invoice
+```
+INVOICE = {
+  no: '116/2012',
+  place_and_date: 'Zagreb, 25.11.2012.godine',
+  reference_number: "16-2012",
+  customer: 'dinkovac',
+  bank_number: '2484008-1105211111',
+  items: [
+    { description: 'EM-12/2011 Izrada izvješća održavanja iz aplikacije MIJAU', amount: 5_432.22 },
+    { description: 'EM-012/2011 Održavanje aplikacije MIJAU ', amount: 100.00 }
+  ]
+}
+
+#rendering
+CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop') #settings example given below
 ```
 ![Example invoice](https://github.com/drKreso/invoice/raw/master/images/example_invoice.png)
 
