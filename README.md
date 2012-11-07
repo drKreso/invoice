@@ -3,7 +3,7 @@
 Print out simple invoice tailored for Croatia. You can setup your company data along with your customers with some easy settings.
 
 This is called to generate your invoice in .pdf
-```reference_numbery
+```ruby
 CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop')
 ```
 
