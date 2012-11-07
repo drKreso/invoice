@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Invoice::VERSION
   gem.authors       = ["drKreso"]
   gem.email         = ["kresimir.bojcic@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Simple .pdf invoice generator for Croatia}
+  gem.summary       = %q{Generate your invoices with less effort}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
