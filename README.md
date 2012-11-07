@@ -1,6 +1,9 @@
 # Invoice
 
-Print out simple invoice tailored for Croatia. You can setup your company data along with your customers with some easy settings.
+Print out simple invoice tailored for Croatia. You can setup your company data along with your customers with some easy settings and calling
+```ruby
+CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop')
+```
 
 ## Installation
 
@@ -56,7 +59,7 @@ SETTINGS= {
   signature_line_1: 'Direktor "KROKODIL ITS" d.o.o.',
   signature_line_2: 'Krešimir Bojčić',
   number_to_words_translation: NumberToKune,
-  footer: "©#{DateTime.now.year} Krokodil ITS d.o.o", :size => 7
+  footer: "©#{DateTime.now.year} Krokodil ITS d.o.o"
 }
 
 INVOICE = {
