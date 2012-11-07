@@ -6,6 +6,7 @@ This is called to generate your invoice in .pdf
 ```ruby
 CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop')
 ```
+![Example invoice](https://github.com/drKreso/invoice/raw/master/images/example_invoice.png)
 
 ## Installation
 
