@@ -3,7 +3,7 @@
 Print out simple invoice tailored for Croatia. You can setup your company data along with your customers with some easy settings.
 
 After that you need to setup invoice data and render the invoice
-```
+```ruby
 INVOICE = {
   no: '116/2012',
   place_and_date: 'Zagreb, 25.11.2012.godine',

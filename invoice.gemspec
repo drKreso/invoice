@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["kresimir.bojcic@gmail.com"]
   gem.description   = %q{Simple .pdf invoice generator for Croatia}
   gem.summary       = %q{Generate your invoices with less effort}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/drKreso/invoice"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
