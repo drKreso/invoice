@@ -78,7 +78,7 @@ SETTINGS =
   signature_line_1: 'Direktor "KROKODIL ITS" d.o.o.',
   signature_line_2: 'Krešimir Bojčić',
   number_to_words_translation: NumberToKune,
-  footer: "Društvo je upisano u registar Trgovačkog suda u Zagrebu pod brojem 080708370\nTemeljni kapital društva iznosi 20.000,00 kn i uplaćen je u cjelosti\nČlan Uprave Krešimir Bojčić zastupa društvo pojedinačno i samostalno"
+  footer: "Društvo je upisano u registar Trgovačkog suda u Zagrebu pod brojem 090608470\nTemeljni kapital društva iznosi 20.000,00 kn i uplaćen je u cjelosti\nČlan Uprave Krešimir Bojčić zastupa društvo pojedinačno i samostalno"
 }
 
 INVOICE = {
