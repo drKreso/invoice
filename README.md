@@ -17,7 +17,7 @@ INVOICE = {
 }
 
 #rendering
-CroatianPDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop') #settings example given below
+PDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop') #settings example given below
 ```
 ![Example invoice](https://github.com/drKreso/invoice/raw/master/images/example_invoice.png)
 
