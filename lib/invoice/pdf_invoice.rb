@@ -6,13 +6,13 @@ require 'barby/barcode/code_39'
 require 'date'
 require 'action_view'
 
-class CroatianPDFInvoice < Prawn::Document
+class PDFInvoice < Prawn::Document
   include ActionView::Helpers::NumberHelper
   extend ActionView::Helpers::NumberHelper
 
   def self.generate(settings, invoice, path)
    File.open(File.expand_path(path) + "/rn_#{invoice[:no].gsub('/','_')}_#{invoice[:customer]}.pdf", 'w') do |file|
-     file.write CroatianPDFInvoice.new(settings, invoice).render
+     file.write PDFInvoice.new(settings, invoice).render
    end
 
   end
@@ -28,7 +28,6 @@ class CroatianPDFInvoice < Prawn::Document
     set_font_family
     add_header
     add_invoice_info
-    add_footer
   end
 
   def add_header
@@ -64,15 +63,23 @@ class CroatianPDFInvoice < Prawn::Document
         indent 15,15 do
           text "#{@invoice[:place_and_date]}", :align => :right
           move_up 13
-          text "Račun broj: #{invoice_no}", :style => :bold, :size => 15
+          if export_no_vat?
+            text "Invoice no. (Račun broj): #{invoice_no}", :style => :bold, :size => 15
+          else
+            text "Račun broj: #{invoice_no}", :style => :bold, :size => 15
+          end
           move_down 25
-          text "Kupac:", :style => :bold
+          if export_no_vat?
+            text "Issued To (Kupac):", :style => :bold
+          else
+            text "Kupac:", :style => :bold
+          end
           move_up 9
           indent 150, 15 do
             text customer[:name], :style => :bold
             text customer[:address_street], :style => :bold
             text customer[:address_city], :style => :bold
-            text customer[:numbers], :style => :bold
+            text customer[:numbers], :style => :bold unless customer[:numbers].nil?
           end
           move_down 40
           stroke_horizontal_rule
@@ -86,46 +93,93 @@ class CroatianPDFInvoice < Prawn::Document
           move_down 5
           stroke_horizontal_rule
           move_down 5
-          text "UKUPNO", :style => :bold
+          if export_no_vat?
+            text "TOTAL (UKUPNO)", :style => :bold
+          else
+            text "UKUPNO", :style => :bold
+          end
           move_up 9
           ukupno = items.map { |item| item[:amount] }.reduce(:+)
           tax_amount = ukupno * (BigDecimal.new(@data[:tax].gsub('%',''))/100.0).round(2)
+          tax_amount = 0 if export_no_vat?
           total = (tax_amount + ukupno).round(2)
           text "#{to_currency(ukupno)}", :align => :right
-          move_down 10
-          text "PDV #{@data[:tax]}", :style => :bold
-          move_up 9
-          text "#{to_currency(tax_amount)}", :align => :right
+          unless export_no_vat?
+            move_down 10
+            text "PDV #{@data[:tax]}", :style => :bold
+            move_up 9
+            text "#{to_currency(tax_amount)}", :align => :right
+          end
           move_down 15
           stroke_horizontal_rule
           move_down 5
-          text "Sveukupno za platiti:"
+          if export_no_vat?
+            text "Total Amount (Sveukupno za platiti):"
+          else
+            text "Sveukupno za platiti:"
+          end
           move_up 9
           text "#{to_currency(total)}", :align => :right , :style => :bold
-          move_down 3
-          text "Slovima: #{NumberToKune.convert(total)}", :font_size => 7
+          unless export_no_vat?
+            move_down 3
+            text "Slovima: #{NumberToKune.convert(total)}", :size => 7
+          end
           move_down 5
           stroke_horizontal_rule
           move_down 25
-          text "Žiro-račun: #{@invoice[:bank_number]}"
+          if export_no_vat?
+            text "IBAN: #{company_info[:account_number]}", :style => :bold
+          else
+            text "Žiro-račun: #{company_info[:account_number]}"
+          end
           move_down 4
-          text "Poziv na broj: #{@invoice[:reference_number]}"
+          if export_no_vat?
+            text "SWIFT: #{company_info[:swift]}"
+          else
+            text "Poziv na broj: #{@invoice[:no].gsub('/','-').gsub('-KB','')}"
+          end
+          move_down 4
+          if export_no_vat?
+            text "Payement type: bank wire (Način plaćanja: uplatom na žiro-račun)"
+          else
+            text "Način plaćanja: uplatom na žiro-račun"
+          end
+          move_down 35
+          text "#{@data[:signature_line_1]}", :style => :italic, :align => :left
+          move_up 10
+          indent 445 do
+            text "#{@data[:signature_line_2]}", :style => :bold, :align => :left
+          end
+          stroke do
+            horizontal_line(430, 540, :at => y - 58)
+          end
           move_down 25
-          text "Račun je izrađen na računalu i pravovaljan je bez potpisa i žiga", :style => :bold
-          move_up 9
-          text "#{@data[:signature_line_1]}", :style => :bold, :align => :right
-          move_down 10
-          text "#{@data[:signature_line_2]}", :style => :bold, :align => :right
+          if export_no_vat?
+            text "This is computer generated INVOICE and requires no signature or stamp (Račun je izrađen na računalu i pravovaljan je bez potpisa i žiga)", :style => :italic, :size => 7
+          else
+            text "Račun je izrađen na računalu i pravovaljan je bez potpisa i žiga", :style => :italic, :size => 7
+          end
 
+          # footer
+          move_y = 25 + @data[:footer].split("\n").count * 9
+          page_count.times do |i|
+            go_to_page(i+1)
+            self.font_size = 7
+            bounding_box([bounds.left, bounds.bottom + move_y], :width => 550) do
+              if export_no_vat?
+                text "Usluga ne podliježe oporezivanju sukladno odredbi čl.5.st.6.t.2 Zakona o PDV-u.", :align => :left , :style => :italic
+              else
+                move_down 10
+              end
+              move_down 15
+              @data[:footer].each_line do |line|
+                text line, :style => :italic
+              end
+            end
+            self.font_size = 9
+          end
         end
       end
-  end
-
-  def add_footer
-    bounding_box [bounds.left, bounds.bottom + 12], :width  => bounds.width do
-      move_down(5)
-      text "#{footer}", :size => 7
-    end
   end
 
   def items
@@ -138,10 +192,6 @@ class CroatianPDFInvoice < Prawn::Document
 
   def company_info
     @data[:company_info]
-  end
-
-  def footer
-    @data[:footer]
   end
 
   def invoice_no
@@ -163,7 +213,18 @@ class CroatianPDFInvoice < Prawn::Document
     BigDecimal.new(self.to_s)
   end
 
+  def to_usd_currency(amount)
+    return '' if amount.nil?
+    "$#{number_with_precision(amount, :precision => 2, :delimiter => '.', :separator => ',')}"
+  end
+
+  def export_no_vat?
+    @data[:customers][@invoice[:customer].to_sym][:location] == 'USA' ||
+    @data[:customers][@invoice[:customer].to_sym][:location] == 'CA'
+  end
+
   def to_currency(amount)
+    return to_usd_currency(amount) if export_no_vat?
     return '' if amount.nil?
     "#{number_with_precision(amount, :precision => 2, :delimiter => '.', :separator => ',')} kn"
   end
