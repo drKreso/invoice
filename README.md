@@ -97,11 +97,11 @@ PDFInvoice.generate(SETTINGS, INVOICE, '~/Desktop')
 puts "Succefully generated on Desktop"
 ```
 
-##History
-1.0.3
-   Added support for no-vat invoices (for location 'USA' and 'CA')
-   Tweaked look and feel
-   New legal text needed since July 1, 2013
+###History
+##1.0.3
+1. Added support for no-vat invoices (for location 'USA' and 'CA')
+2. Tweaked look and feel
+3. New legal text needed since July 1, 2013
 
 
 ## Contributing
