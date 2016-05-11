@@ -3,8 +3,13 @@ require 'prawn'
 require 'barby'
 require 'barby/outputter/prawn_outputter'
 require 'barby/barcode/code_39'
+#require 'barby/barcode/pdf_417'
+require 'java'
 require 'date'
 require 'action_view'
+require_relative 'PDF417'
+
+
 
 class PDFInvoice < Prawn::Document
   include ActionView::Helpers::NumberHelper
@@ -40,7 +45,6 @@ class PDFInvoice < Prawn::Document
         text company_info[:phone], :size => 8
       end
     end
-
   end
 
   def add_invoice_info
@@ -54,10 +58,6 @@ class PDFInvoice < Prawn::Document
         move_down 35
         indent 0, 15 do
           text "R-1", :size => 10, :style => :bold, :align => :right
-        end
-        bounding_box [15, bounds.top - 15], :width => 160, :height => 35 do
-          barcode = Barby::Code39.new(invoice_no)
-          barcode.annotate_pdf(self, :height => 35, :width => 150)
         end
         move_down 15
         indent 15,15 do
@@ -159,7 +159,36 @@ class PDFInvoice < Prawn::Document
           else
             text "Račun je izrađen na računalu i pravovaljan je bez potpisa i žiga", :style => :italic, :size => 7
           end
+          bounding_box [15, bounds.top - 15], :width => 160, :height => 35 do
+            broj_racuna = @invoice[:no].split("/")[0]
+            racun = (tax_amount + ukupno)
+            abc = racun.to_s.gsub(".","")
+            bla = abc.rjust(15, '0')
 
+            items.each_with_index do |item, index|
+            abc = item[:description].split(" ").drop(1).join(" ")
+            end
+            barcode_data = ["Hrvhub30",  
+                            "HRK",
+                            bla,
+                            customer[:name],
+                            customer[:address_street],
+                            customer[:address_city],
+                            "KROKODIL ITS d.o.o. ",
+                            customer[:address_street],
+                            "",  
+                            company_info[:account_number],
+                            "HR00",
+                            broj_racuna,
+                            " ",
+                            "Novčana naknada za " + abc].join("\n").nomalize_for_fina.force_encoding("Windows-1250")
+
+            barcode_new = Barby::Pdf417.new(barcode_data)
+            barcode_new.y_height = 0.7
+	          barcode_new.aspect_ratio = 0.276 
+	          barcode_new.annotate_pdf(self)
+          end
+           
           # footer
           move_y = 25 + @data[:footer].split("\n").count * 9
           page_count.times do |i|
@@ -174,7 +203,7 @@ class PDFInvoice < Prawn::Document
               move_down 15
               @data[:footer].each_line do |line|
                 text line, :style => :italic
-              end
+             end
             end
             self.font_size = 9
           end
@@ -229,4 +258,11 @@ class PDFInvoice < Prawn::Document
     "#{number_with_precision(amount, :precision => 2, :delimiter => '.', :separator => ',')} kn"
   end
 
+end
+
+class String
+  def nomalize_for_fina
+    self.tr 'QWERTZUIOPASDFGHJKLYXCVBNMŠĐŽČĆqwertzuiopasdfghjklyxcvbnmšđžčć',
+            'QWERTZUIOPASDFGHJKLYXCVBNMSDZCCqwertzuiopasdfghjklyxcvbnmsdzcc'
+  end
 end

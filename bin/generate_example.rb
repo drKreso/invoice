@@ -1,4 +1,5 @@
 #encoding:utf-8
+
 require '../lib/invoice/pdf_invoice'
 require 'amount_inflector'
 
@@ -9,7 +10,7 @@ SETTINGS =
                   address: 'HRVOJA TURUDIĆA 55, HR-10000  Zagreb, HRVATSKA',
                   numbers: 'MB 2511611, OIB 511111112312',
                   phone: 'M: +385 94 111 7072',
-                  account_number: 'HR3324640081405230496',
+                  account_number: 'HR9223400091510077598', #namjesten Iban
                   swift: 'RZBHHR2X'
                 },
  customers:
