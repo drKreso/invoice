@@ -35,6 +35,8 @@ Or install it yourself as:
 
     $ gem install invoice
 
+You will need jruby
+
 ## Limitations
 
 Only supports one page invoice.
